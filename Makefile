@@ -1,13 +1,13 @@
 .POSIX:
 
 CFLAGS = -Wall -Wextra -O0 -ggdb -std=c99
-LIBS   = -lxcb-randr -lxcb
+LIBS   = -lxcb-randr -lxcb -lm
 
 PREFIX = /usr/local
 BINDIR = $(PREFIX)/bin
 TARGET = xrandr-invert-colors
 
-SRC = gamma_randr.c xrandr-invert-colors.c
+SRC = gamma_randr.c hsv_conversion.c invert_gamma_ramps.c xrandr-invert-colors.c 
 OBJ = $(SRC:.c=.o)
 
 all: $(TARGET)
@@ -15,7 +15,7 @@ all: $(TARGET)
 $(TARGET): $(OBJ)
 	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
 
-$(OBJ): gamma_randr.h
+$(OBJ): gamma_randr.h hsv_conversion.h invert_gamma_ramps.h
 
 clean:
 	rm -f $(TARGET) $(OBJ)

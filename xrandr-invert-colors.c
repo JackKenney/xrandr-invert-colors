@@ -16,6 +16,7 @@
  */
 
 #include "gamma_randr.h"
+#include "invert_gamma_ramps.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -217,14 +218,28 @@ int invert_colors_for_crtc(randr_state_t *state, int crtc_num){
 void copy_inverted_ramps(const randr_crtc_state_t *crtc_status,
 						 uint16_t *r, uint16_t *g, uint16_t *b){
 	unsigned int ramp_size = crtc_status->ramp_size;
+	
+	uint16_t *r_new = &(crtc_status->saved_ramps[0 * ramp_size]);
+	uint16_t *g_new = &(crtc_status->saved_ramps[1 * ramp_size]);
+	uint16_t *b_new = &(crtc_status->saved_ramps[2 * ramp_size]);
+
+	// shift_color(r_new,g_new,b_new,ramp_size);
+	// vibrance_shift(r_new, g_new, b_new, ramp_size);
+	// flip_gamma(r_new, g_new, b_new, ramp_size);
+	undo_inversion(r_new, g_new, b_new, ramp_size);
+
 	unsigned i;
 	for(i = 0; i < ramp_size; i++){
-		r[ramp_size - 1 - i] = crtc_status->saved_ramps[i + 0 * ramp_size];
+		printf("%5d,", r_new[i]);
+		r[ramp_size - 1 - i] = r_new[i];
+	}
+	printf("\n\n\n");
+	for(i = 0; i < ramp_size; i++){
+		// printf("G: %5d @ %3d\n", g_new[i], i);
+		g[ramp_size - 1 - i] = g_new[i];
 	}
 	for(i = 0; i < ramp_size; i++){
-		g[ramp_size - 1 - i] = crtc_status->saved_ramps[i + 1 * ramp_size];
-	}
-	for(i = 0; i < ramp_size; i++){
-		b[ramp_size - 1 - i] = crtc_status->saved_ramps[i + 2 * ramp_size];
+		// printf("B: %5d @ %3d\n", b_new[i], i);
+		b[ramp_size - 1 - i] = b_new[i];
 	}
 }
